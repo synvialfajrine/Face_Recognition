@@ -32,24 +32,25 @@ def main():
     st.write("**Face Recognition**")
     frame_placeholder = st.empty()
     detected_faces_placeholder = st.empty()
-    cap_index = 0
-    cap = cv2.VideoCapture(cap_index)
+    # cap_index = 0
+    # cap = cv2.VideoCapture(cap_index)
     # Set video width and height
+
+    
+    for i in range(3):  # Try indices from 0 to 9
+        cap = cv2.VideoCapture(i)
+        if cap.isOpened():
+            st.write(f"Camera index {i} is available.")
+            break  # Break out of the loop if a valid camera index is found
+        else:
+            st.warning(f"Camera index {i} is not available.")
+
+    else:
+        # The 'else' clause runs if the loop completes without a 'break'
+        st.error("Error: Please check camera permissions and make sure no other application is using camera.")
+        st.stop()
     cap.set(3, 640)
     cap.set(4, 480)
-    
-    # for i in range(3):  # Try indices from 0 to 9
-    #     cap = cv2.VideoCapture(i)
-    #     if cap.isOpened():
-    #         st.write(f"Camera index {i} is available.")
-    #         break  # Break out of the loop if a valid camera index is found
-    #     else:
-    #         st.warning(f"Camera index {i} is not available.")
-
-    # else:
-    #     # The 'else' clause runs if the loop completes without a 'break'
-    #     st.error("Error: Please check camera permissions and make sure no other application is using camera.")
-    #     st.stop()
 
     confidence_threshold = 0.5
     cropped_imgs=[]
