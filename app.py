@@ -46,17 +46,13 @@ def main():
     #         st.error(f'Error: Unable to open the camera at indices 0 and 1.')
     #         st.stop()
     # Check additional camera indices
-    for i in range(2):  # Try indices from 0 to 1
-        try:
-            cap_additional = cv2.VideoCapture(i)
-            if cap_additional.isOpened():
-                st.write(f"Camera index {i} is available.")
-                cap_additional.release()
-            else:
-                st.warning(f"Camera index {i} is not available.")
-        except cv2.error as e_additional:
-            st.error(f"Error opening camera index {i}: {e_additional}")
-            st.warning(f"Please check camera permissions and make sure no other application is using camera index {i}.")
+    for i in range(2):  # Try indices from 0 to 9
+        cap = cv2.VideoCapture(i)
+        if cap.isOpened():
+            st.write(f"Camera index {i} is available.")
+            cap.release()
+        else:
+            st.warning(f"Camera index {i} is not available.")
 
     confidence_threshold = 0.5
     cropped_imgs=[]
