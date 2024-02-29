@@ -37,20 +37,35 @@ def main():
     # Set video width and height
 
     
-    for i in range(3):  # Try indices from 0 to 9
+    # for i in range(3):  # Try indices from 0 to 9
+    #     cap = cv2.VideoCapture(i)
+    #     if cap.isOpened():
+    #         st.write(f"Camera index {i} is available.")
+    #         break  # Break out of the loop if a valid camera index is found
+    #     else:
+    #         st.warning(f"Camera index {i} is not available.")
+
+    # else:
+    #     # The 'else' clause runs if the loop completes without a 'break'
+    #     st.error("Error: Please check camera permissions and make sure no other application is using camera.")
+    #     st.stop()
+    # cap.set(3, 640)
+    # cap.set(4, 480)
+
+    # Check for available cameras and allow user selection with informative messages
+    available_cameras = []
+    for i in range(10):  # Iterate through a reasonable number of potential indices
         cap = cv2.VideoCapture(i)
         if cap.isOpened():
-            st.write(f"Camera index {i} is available.")
-            break  # Break out of the loop if a valid camera index is found
-        else:
-            st.warning(f"Camera index {i} is not available.")
+            available_cameras.append(f"Camera {i}")
+            cap.release()  # Release the camera immediately after checking
 
-    else:
-        # The 'else' clause runs if the loop completes without a 'break'
-        st.error("Error: Please check camera permissions and make sure no other application is using camera.")
+    if not available_cameras:
+        st.error("No cameras detected. Please ensure a camera is connected and accessible.")
         st.stop()
-    cap.set(3, 640)
-    cap.set(4, 480)
+
+    camera_index = st.selectbox("Select Camera", available_cameras)
+    cap = cv2.VideoCapture(int(camera_index.split()[1]))  # Extract selected index
 
     confidence_threshold = 0.5
     cropped_imgs=[]
