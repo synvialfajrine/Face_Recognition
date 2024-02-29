@@ -9,12 +9,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 #INITIALIZE
 facenet = FaceNet()
-faces_embeddings = np.load("https://github.com/synvialfajrine/Face_Recognition/blob/main/faces_embeddings.npz")
+faces_embeddings = np.load("https://github.com/synvialfajrine/Face_Recognition/raw/main/faces_embeddings.npz")
 Y = faces_embeddings['arr_1']
 encoder = LabelEncoder()
 encoder.fit(Y)
-haarcascade = cv2.CascadeClassifier("https://github.com/synvialfajrine/Face_Recognition/blob/main/haarcascade_frontalface_default.xml")
-model = pickle.load(open("https://github.com/synvialfajrine/Face_Recognition/blob/main/svm_model_160x160.pkl", 'rb'))
+haarcascade = cv2.CascadeClassifier("https://github.com/synvialfajrine/Face_Recognition/raw/main/haarcascade_frontalface_default.xml")
+model = pickle.load(open("https://github.com/synvialfajrine/Face_Recognition/raw/main/svm_model_160x160.pkl", 'rb'))
 
 # Content for the sidebar
 sidebar_content = """
