@@ -46,7 +46,7 @@ def main():
     #         st.error(f'Error: Unable to open the camera at indices 0 and 1.')
     #         st.stop()
     # Check additional camera indices
-    for i in range(10):  # Try indices from 0 to 9
+    for i in range(2):  # Try indices from 0 to 9
         cap = cv2.VideoCapture(i)
         if cap.isOpened():
             st.write(f"Camera index {i} is available.")
