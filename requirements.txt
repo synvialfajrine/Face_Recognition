@@ -4,3 +4,4 @@ opencv-python==4.9.0.80
 keras==2.15.0
 keras-facenet==0.3.2
 scikit-learn==1.2.2
+tensorflow==2.15.0
