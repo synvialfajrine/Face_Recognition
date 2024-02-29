@@ -91,7 +91,6 @@ def main():
                             col.image(im, use_column_width=True)
 
     cap.release()
-    cv2.destroyAllWindows
 
 
 
