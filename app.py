@@ -56,7 +56,7 @@ def main():
 
     else:
         # The 'else' clause runs if the loop completes without a 'break'
-        st.error("Error: Unable to open any camera. Please check your camera connections.")
+        st.error("Error: Please check camera permissions and make sure no other application is using camera.")
         st.stop()
 
     confidence_threshold = 0.5
