@@ -9,12 +9,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 #INITIALIZE
 facenet = FaceNet()
-faces_embeddings = np.load(".model/faces_embeddings.npz")
+faces_embeddings = np.load("faces_embeddings.npz")
 Y = faces_embeddings['arr_1']
 encoder = LabelEncoder()
 encoder.fit(Y)
-haarcascade = cv2.CascadeClassifier(".model/haarcascade_frontalface_default.xml")
-model = pickle.load(open(".model/svm_model_160x160.pkl", 'rb'))
+haarcascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+model = pickle.load(open("svm_model_160x160.pkl", 'rb'))
 
 # Content for the sidebar
 sidebar_content = """
