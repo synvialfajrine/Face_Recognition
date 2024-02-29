@@ -32,7 +32,19 @@ def main():
     st.write("**Face Recognition**")
     frame_placeholder = st.empty()
     detected_faces_placeholder = st.empty()
-    cap = cv2.VideoCapture(0)
+    cap_index = 0
+    cap = cv2.VideoCapture(cap_index)
+    
+    # If unable to open, try with index 1
+    if not cap.isOpened():
+        st.warning(f'Warning: Unable to open the camera at index {cap_index}. Trying with index 1.')
+        cap_index = 1
+        cap = cv2.VideoCapture(cap_index)
+
+        # If still unable to open, display an error message and stop the app
+        if not cap.isOpened():
+            st.error(f'Error: Unable to open the camera at indices 0 and 1.')
+            st.stop()
 
     confidence_threshold = 0.5
     cropped_imgs=[]
