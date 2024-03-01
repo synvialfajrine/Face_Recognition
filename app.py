@@ -1,13 +1,16 @@
-import cv2
 import streamlit as st
 import numpy as np
 import os
+import cv2
+import av
+from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
 from sklearn.preprocessing import LabelEncoder
 import pickle
 from keras_facenet import FaceNet
-os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-#INITIALIZE
+# INITIALIZE
 facenet = FaceNet()
 faces_embeddings = np.load("faces_embeddings.npz")
 Y = faces_embeddings['arr_1']
@@ -26,86 +29,54 @@ sidebar_content = """
     - Alfajrine
 """
 
-def main():
-    st.sidebar.markdown(sidebar_content)
+#RTC_CONFIGURATION
+RTC_CONFIGURATION = RTCConfiguration(
+    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+)
+recognized_names = []  # List to store recognized names
 
-    st.write("**Face Recognition**")
-    frame_placeholder = st.empty()
-    detected_faces_placeholder = st.empty()
-
-    # Check for available cameras and allow user selection with informative messages
-    available_cameras = []
-    for i in range(10):  # Iterate through a reasonable number of potential indices
-        cap = cv2.VideoCapture(i)
-        if cap.isOpened():
-            available_cameras.append(f"Camera {i}")
-            cap.release()  # Release the camera immediately after checking
-
-    if not available_cameras:
-        st.error("No cameras detected. Please ensure a camera is connected and accessible.")
-        st.stop()
-
-    camera_index = st.selectbox("Select Camera", available_cameras)
-    cap = cv2.VideoCapture(int(camera_index.split()[1]))  # Extract selected index
-
-    confidence_threshold = 0.5
-    cropped_imgs=[]
-    frames_processed = 0
-    update_interval = 20  # Update every 5 frames
-    placeholder = st.empty()
-    while cap.isOpened():
-        _, frame = cap.read()
-        #frame.flags.writeable = False
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        rgb_img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+class VideoProcessor():
+    def recv(self, frame):
+        image = frame.to_ndarray(format="bgr24")
+        # frame.flags.writeable = False
+        rgb_img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         faces = haarcascade.detectMultiScale(gray_img, 1.3, 5)
-        for x,y,w,h in faces:
-            cropped_img = rgb_img[y:y+h, x:x+w]
+        
+        confidence_threshold = 0.5
+
+        for x, y, w, h in faces:
+            #cropped_img = rgb_img[y:y+h, x:x+w]
             img = rgb_img[y:y+h, x:x+w]
-            img = cv2.resize(img, (160,160)) # 1x160x160x3
-            img = np.expand_dims(img,axis=0)
+            img = cv2.resize(img, (160, 160))
+            img = np.expand_dims(img, axis=0)
             ypred = facenet.embeddings(img)
             face_name = model.predict(ypred)
             conf = model.predict_proba(ypred)
-
-            #save cropped face images
-            if cropped_img is not None:
-                cropped_imgs.append(cropped_img)
-            if len(cropped_imgs)>6:
-                cropped_imgs.pop(0)
-            #cropped_images = np.array(cropped_imgs)
 
             if conf.max() < confidence_threshold:
                 final_name = 'unknown'
             else:
                 final_name = encoder.inverse_transform(face_name)[0]
+        
+            #recognized_names.append(final_name)  # Store recognized names
 
-            #final_name = encoder.inverse_transform(face_name)[0]
-            cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,255), 10)
-            cv2.putText(frame, str(final_name), (x,y-10), cv2.FONT_HERSHEY_SIMPLEX,
-                        1, (0,0,255), 3, cv2.LINE_AA)
-            placeholder.write("Detected Faces")
-            frame_placeholder.image(frame, use_column_width=True)
+            cv2.rectangle(image, (x, y), (x+w, y+h), (64, 224, 208), 10)
+            cv2.putText(image, str(final_name), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX,
+                    1, (255, 105, 180), 3, cv2.LINE_AA)
             
-            
-            col1, col2, col3, col4, col5 = st.columns(5)
+            return av.VideoFrame.from_ndarray(image, format="bgr24")
 
-            frames_processed += 1
-            if frames_processed % update_interval == 0:
-                # Clear the previous content and update detected faces
-                detected_faces_placeholder.empty()
-                with detected_faces_placeholder:
-                    col1, col2, col3, col4, col5 = st.columns(5)
-                    for i, col in enumerate([col1, col2, col3, col4, col5]):
-                        if i < len(cropped_imgs):
-                            im = cv2.cvtColor(cropped_imgs[i], cv2.COLOR_BGR2RGB)
-                            col.image(im, use_column_width=True)
 
-    cap.release()
-    st.success('Video is processed')
-    st.stop()
+st.sidebar.markdown(sidebar_content)
 
-if __name__ == '__main__':
-    main()
+st.write("**Face Recognition**")
+    
+webrtc_streamer(
+    key="facerecognition",
+    mode=WebRtcMode.SENDRECV,
+    rtc_configuration=RTC_CONFIGURATION,
+    media_stream_constraints={"video": True, "audio": False},
+    video_processor_factory=VideoProcessor,
+    async_processing=True,
+)
