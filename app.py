@@ -31,7 +31,7 @@ sidebar_content = """
 
 #RTC_CONFIGURATION
 RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": 'turns:freestun.tel:5350'}]}
+    {"iceServers": [{"urls": 'stun:freestun.net:5350'}]}
 )
 
 recognized_names = []  # List to store recognized names
