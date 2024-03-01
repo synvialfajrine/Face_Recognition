@@ -31,8 +31,13 @@ sidebar_content = """
 
 #RTC_CONFIGURATION
 RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+    {"iceServers": 
+     [ 
+         {"urls": 'turns:freestun.tel:5350', 
+          "username": 'free',
+          "credential": 'free' } ]}
 )
+
 recognized_names = []  # List to store recognized names
 
 class VideoProcessor(VideoTransformerBase):
