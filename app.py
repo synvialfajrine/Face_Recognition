@@ -35,7 +35,7 @@ RTC_CONFIGURATION = RTCConfiguration(
 )
 recognized_names = []  # List to store recognized names
 
-class VideoProcessor():
+class VideoProcessor(VideoTransformerBase):
     def recv(self, frame):
         image = frame.to_ndarray(format="bgr24")
         # frame.flags.writeable = False
